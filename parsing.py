@@ -52,7 +52,7 @@ def sort_pdf(pdf_file):
         if "Parameter Group Name and Acronym" in page.get_text():
             doc2 += page.get_text(sort=True)
 
-    doc1 = doc1.split("Data Length: \n")[1:3]
+    doc1 = doc1.split("Data Length: \n")[1:]
     doc2 = doc2.split("-71 \n5.2")[1:]
 
     return doc1, doc2
