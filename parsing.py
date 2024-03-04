@@ -1,13 +1,13 @@
 import fitz
 import re
 import tqdm
-
-
 from googletrans import Translator
+
 from db.models import Data
 
 
-def database_entry(session, id, data_length, length, name, scaling, range, spn):
+def database_entry(session, id, data_length, length,
+                   name, scaling, range, spn):
     """
     Запись данных в базу данных
     """
@@ -24,16 +24,18 @@ def database_entry(session, id, data_length, length, name, scaling, range, spn):
     # print(spn)
     # print("__________________________")
 
-    session.add(Data(id=id, 
-                     data_length=data_length, 
-                     length=length, 
-                     name=name, 
-                     rus_name=translator.translate(name, src='English', dest='Russian').text, 
-                     scaling=scaling, 
-                     range=range, 
+    session.add(Data(id=id,
+                     data_length=data_length,
+                     length=length,
+                     name=name,
+                     rus_name=translator.translate(name,
+                                                   src='English',
+                                                   dest='Russian').text,
+                     scaling=scaling,
+                     range=range,
                      spn=spn))
     session.commit()
-    
+
 
 def sort_pdf(pdf_file):
     """
@@ -49,14 +51,15 @@ def sort_pdf(pdf_file):
             doc1 += page.get_text(sort=True)
         if "Parameter Group Name and Acronym" in page.get_text():
             doc2 += page.get_text(sort=True)
-    
+
     doc1 = doc1.split("Data Length: \n")[1:3]
     doc2 = doc2.split("-71 \n5.2")[1:]
 
     return doc1, doc2
 
 
-def get_additional_parameters(session, doc2, pgn, paragraph, parameter_name, id, data_length, length):
+def get_additional_parameters(session, doc2, pgn, paragraph, parameter_name,
+                              id, data_length, length):
 
     pattern = re.compile(r"Slot Scaling:[\s0-9\W\w]*SPN: \n\d*")
     tqdm_doc2 = tqdm.tqdm(doc2, ascii=True, colour='blue')
@@ -67,7 +70,8 @@ def get_additional_parameters(session, doc2, pgn, paragraph, parameter_name, id,
             scaling = group[0][13:]
             range = group[4]
             spn = group[-1]
-            database_entry(session, id, data_length, length, parameter_name, scaling, range, spn)
+            database_entry(session, id, data_length, length,
+                           parameter_name, scaling, range, spn)
 
 
 def parsing_pdf(pdf_file, session):
@@ -89,5 +93,5 @@ def parsing_pdf(pdf_file, session):
             parameter_name = line.split("\n")[1].strip(" ")
             paragraph = line.split("\n")[3].strip(" ")
             length = line.split("\n")[0].strip(" ")
-            
+
             get_additional_parameters(session, doc2, pgn, paragraph, parameter_name, id, data_length, length)

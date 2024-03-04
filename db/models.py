@@ -19,10 +19,10 @@ class Data(Base):
     spn = sq.Column(sq.String(length=10), nullable=False)
 
     def __str__(self):
-        return f"{self.id, self.data_length, self.length, self.name, self.rus_name, self.scaling, self.range, self.spn}"
-    
+        return f"{self.id, self.data_length, self.length, self.name,
+                  self.rus_name, self.scaling, self.range, self.spn}"
+
 
 def create_tables(engine):
     # Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-    
